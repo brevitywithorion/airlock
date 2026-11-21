@@ -58,13 +58,16 @@ func get(t *testing.T, h http.Handler, path string) *httptest.ResponseRecorder {
 func TestMux(t *testing.T) {
 	var readyErr error
 	mcp := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusTeapot) })
-	mux := NewMux(mcp, func() error { return readyErr })
+	mux := NewMux(Routes{MCP: mcp, Ready: func() error { return readyErr }})
 
 	if w := get(t, mux, "/healthz"); w.Code != http.StatusOK || w.Body.String() != "ok\n" {
 		t.Errorf("healthz = %d %q", w.Code, w.Body.String())
 	}
 	if w := get(t, mux, "/mcp"); w.Code != http.StatusTeapot {
 		t.Errorf("/mcp = %d", w.Code)
+	}
+	if w := get(t, NewMux(Routes{MCP: mcp}), "/healthz"); w.Code != http.StatusNotFound {
+		t.Errorf("healthz without Ready = %d, want it on the ops listener only", w.Code)
 	}
 
 	w := get(t, mux, "/readyz")

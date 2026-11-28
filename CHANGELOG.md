@@ -8,6 +8,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - `${NAME:-default}` in a config value uses `default` when `NAME` is unset or empty. `${NAME}` is still an error when the variable is unset.
 
+### Changed
+
+- A config value that already holds a literal `${NAME:-text}` is now expanded, since `:-` is read as a default. A value that held such text before needs a variable set for it, or its default changed.
+
 ## [0.2.0] - 2026-11-21
 
 ### Added
